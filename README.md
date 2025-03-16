@@ -1,5 +1,5 @@
 <p>
-  <img width="100%" src="https://assets.solidjs.com/banner?type={{name_of_lib}}&background=tiles&project=%20" alt="convex-solid">
+  <img width="100%" src="https://assets.solidjs.com/banner?type=convex-solid&background=tiles&project=%20" alt="convex-solid">
 </p>
 
 # convex-solid
