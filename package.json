@@ -1,17 +1,16 @@
 {
-  "name": "{{name_of_lib}}",
+  "name": "convex-solidjs",
   "version": "0.0.0",
-  "description": "{{desc_of_lib}}",
+  "description": "Convex SolidJS Client",
   "license": "MIT",
-  "author": "{{me}}",
+  "author": "jiangda2@illinois.edu",
   "contributors": [],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/{{me}}/{{name_of_lib}}.git"
+    "url": "git+https://github.com/frank-iii/convex-solidjs.git"
   },
-  "homepage": "https://github.com/{{me}}/{{name_of_lib}}#readme",
   "bugs": {
-    "url": "https://github.com/{{me}}/{{name_of_lib}}/issues"
+    "url": "https://github.com/frank-iii/convex-solidjs/issues"
   },
   "files": [
     "dist"
