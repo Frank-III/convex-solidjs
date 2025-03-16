@@ -83,5 +83,8 @@
   "engines": {
     "node": ">=18",
     "pnpm": ">=9.0.0"
+  },
+  "dependencies": {
+    "convex": "^1.20.0"
   }
 }
