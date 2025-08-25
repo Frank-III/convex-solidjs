@@ -4,3 +4,42 @@ gitignore
 
 # tsup
 tsup.config.bundled_*.{m,c,}s
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Temporary files
+*.log
+*.tmp
+.cache/
+
+# Claude AI
+.claude/
+
+# Documentation drafts
+*.mdc
+convex-svelte.txt
+USAGE.md
+
+# Development
+dev/.env
+dev/.env.local
+dev/node_modules/
+dev/dist/
+dev/.convex/
+dev/convex/_generated/
+
+# Lock files in dev folder (keeping root lock files)
+dev/pnpm-lock.yaml
+dev/package-lock.json
+dev/yarn.lock

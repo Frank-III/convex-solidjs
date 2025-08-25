@@ -1,6 +1,6 @@
 {
   "name": "convex-solidjs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Convex SolidJS Client",
   "license": "MIT",
   "author": "jiangda2@illinois.edu",
@@ -56,24 +56,24 @@
     "solid-js": "^1.6.0"
   },
   "devDependencies": {
-    "@types/node": "^20.12.12",
-    "@typescript-eslint/eslint-plugin": "^7.9.0",
-    "@typescript-eslint/parser": "^7.9.0",
-    "concurrently": "^8.2.2",
-    "esbuild": "^0.21.3",
+    "@types/node": "^24.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.40.0",
+    "@typescript-eslint/parser": "^8.40.0",
+    "concurrently": "^9.2.0",
+    "esbuild": "^0.25.9",
     "esbuild-plugin-solid": "^0.6.0",
-    "eslint": "^8.56.0",
+    "eslint": "^9.33.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
-    "eslint-plugin-no-only-tests": "^3.1.0",
-    "jsdom": "^24.0.0",
-    "prettier": "3.0.0",
-    "solid-js": "^1.8.17",
-    "tsup": "^8.0.2",
+    "eslint-plugin-no-only-tests": "^3.3.0",
+    "jsdom": "^26.1.0",
+    "prettier": "3.6.2",
+    "solid-js": "^1.9.9",
+    "tsup": "^8.5.0",
     "tsup-preset-solid": "^2.2.0",
-    "typescript": "^5.4.5",
-    "vite": "^5.2.11",
-    "vite-plugin-solid": "^2.10.2",
-    "vitest": "^1.6.0"
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3",
+    "vite-plugin-solid": "^2.11.8",
+    "vitest": "^3.2.4"
   },
   "keywords": [
     "solid"
@@ -84,6 +84,7 @@
     "pnpm": ">=9.0.0"
   },
   "dependencies": {
-    "convex": "^1.20.0"
+    "@solid-primitives/context": "^0.3.2",
+    "convex": "^1.25.4"
   }
 }

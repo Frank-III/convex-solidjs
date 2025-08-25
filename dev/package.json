@@ -1,0 +1,18 @@
+{
+  "name": "convex-solidjs-demo",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "convex:dev": "convex dev"
+  },
+  "dependencies": {
+    "convex": "^1.17.4",
+    "solid-js": "^1.9.3"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "vite-plugin-solid": "^2.10.0"
+  }
+}
