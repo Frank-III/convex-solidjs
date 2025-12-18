@@ -81,19 +81,19 @@ export function useQuery<Query extends FunctionReference<'query'>>(
   const getOptions = createMemo(() => resolve(options ?? {}))
 
   // Track real-time updates
-  const [version, setVersion] = createSignal(0)
   const [liveData, setLiveData] = createSignal<Data | undefined>()
   const [liveError, setLiveError] = createSignal<Error | undefined>()
+  const [hasReceivedData, setHasReceivedData] = createSignal(false)
 
   // Resource for data fetching
   const [resource, { refetch }] = createResource<
     Data | undefined,
-    { args: FunctionArgs<Query>; version: number }
+    { args: FunctionArgs<Query> }
   >(
     () => {
       const opts = getOptions()
       if (opts.enabled === false) return null
-      return { args: getArgs(), version: version() }
+      return { args: getArgs() }
     },
     async source => {
       // Try sync result first
@@ -113,7 +113,7 @@ export function useQuery<Query extends FunctionReference<'query'>>(
 
       // Use initial data if nothing else available
       const opts = getOptions()
-      if (opts.initialData !== undefined && version() === 0) {
+      if (opts.initialData !== undefined && !hasReceivedData()) {
         return opts.initialData
       }
 
@@ -133,14 +133,14 @@ export function useQuery<Query extends FunctionReference<'query'>>(
           batch(() => {
             setLiveData(() => data as Data)
             setLiveError(undefined)
-            setVersion(v => v + 1)
+            setHasReceivedData(true)
           })
         },
         error => {
           batch(() => {
             setLiveError(() => error)
             setLiveData(undefined)
-            setVersion(v => v + 1)
+            setHasReceivedData(true)
           })
         },
       )
@@ -151,15 +151,17 @@ export function useQuery<Query extends FunctionReference<'query'>>(
 
   // Computed values
   const data = createMemo(() => {
+    const live = liveData()
+    if (live !== undefined) return live
     const opts = getOptions()
-    if (opts.keepPreviousData && resource.loading && resource.latest) {
+    if (opts.keepPreviousData && resource.latest) {
       return resource.latest
     }
     return resource()
   })
 
-  const error = createMemo(() => resource.error)
-  const isLoading = createMemo(() => resource.loading && !data())
+  const error = createMemo(() => liveError() ?? resource.error)
+  const isLoading = createMemo(() => resource.loading && liveData() === undefined)
   const isStale = createMemo(() =>
     Boolean(
       getOptions().keepPreviousData &&
