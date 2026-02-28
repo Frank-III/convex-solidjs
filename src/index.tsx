@@ -1,16 +1,14 @@
 import {
   onCleanup,
   createEffect,
-  createMemo,
   createSignal,
-  createResource,
   batch,
   on,
   type Accessor,
 } from 'solid-js'
 import { isServer } from 'solid-js/web'
 import { createContextProvider } from '@solid-primitives/context'
-import { ConvexClient, type ConvexClientOptions } from 'convex/browser'
+import { ConvexClient, ConvexHttpClient, type ConvexClientOptions } from 'convex/browser'
 import {
   type FunctionReference,
   type FunctionArgs,
@@ -38,13 +36,30 @@ export function setupConvex(url: string, options?: ConvexClientOptions): ConvexC
     throw new Error('setupConvex requires a valid URL string')
   }
 
-  const client = new ConvexClient(url, {
+  return new ConvexClient(url, {
     disabled: isServer,
     ...options,
   })
+}
 
-  onCleanup(() => client.close())
-  return client
+// Setup HTTP client for SSR/data prefetching
+export function setupConvexHttp(
+  url: string,
+  options?: ConstructorParameters<typeof ConvexHttpClient>[1],
+): ConvexHttpClient {
+  if (!url || typeof url !== 'string') {
+    throw new Error('setupConvexHttp requires a valid URL string')
+  }
+  return new ConvexHttpClient(url, options)
+}
+
+// Prefetch helper for SSR loaders
+export async function prefetchQuery<Query extends FunctionReference<'query'>>(
+  client: ConvexHttpClient,
+  query: Query,
+  args: FunctionArgs<Query>,
+): Promise<FunctionReturnType<Query>> {
+  return client.query(query, args)
 }
 
 // Query options
@@ -70,103 +85,113 @@ export function useQuery<Query extends FunctionReference<'query'>>(
   options?: MaybeAccessor<QueryOptions<FunctionReturnType<Query>>>,
 ): QueryReturn<FunctionReturnType<Query>> {
   type Data = FunctionReturnType<Query>
+  const defaultOptions = {} as QueryOptions<Data>
+
+  // Resolve reactive values
+  const getArgs = () => resolve(args)
+  const getOptions = () => resolve(options) ?? defaultOptions
+
+  // SSR mode: always return initialData and avoid live subscriptions.
+  if (isServer) {
+    const data = () => getOptions().initialData
+    const error = () => undefined
+    const isLoading = () => false
+    const isStale = () => false
+    const refetch = () => {}
+    return { data, error, isLoading, isStale, refetch }
+  }
 
   const client = useConvexClient()
   if (!client) {
     throw new Error('useQuery must be used within ConvexProvider')
   }
 
-  // Resolve reactive values
-  const getArgs = createMemo(() => resolve(args))
-  const getOptions = createMemo(() => resolve(options ?? {}))
+  const [reloadKey, setReloadKey] = createSignal(0)
+  const [data, setData] = createSignal<Data | undefined>(getOptions().initialData)
+  const [error, setError] = createSignal<Error | undefined>()
+  const [isLoading, setIsLoading] = createSignal(false)
+  const [isStale, setIsStale] = createSignal(false)
 
-  // Track real-time updates
-  const [version, setVersion] = createSignal(0)
-  const [liveData, setLiveData] = createSignal<Data | undefined>()
-  const [liveError, setLiveError] = createSignal<Error | undefined>()
+  const refetch = () => setReloadKey(v => v + 1)
 
-  // Resource for data fetching
-  const [resource, { refetch }] = createResource<
-    Data | undefined,
-    { args: FunctionArgs<Query>; version: number }
-  >(
-    () => {
-      const opts = getOptions()
-      if (opts.enabled === false) return null
-      return { args: getArgs(), version: version() }
-    },
-    async source => {
-      // Try sync result first
-      try {
-        const result = client.client.localQueryResult(getFunctionName(query), source.args)
-        if (result !== undefined) return result as Data
-      } catch {
-        // Sync query can fail, continue to subscription
-      }
-
-      // Use live data if available
-      const error = liveError()
-      if (error) throw error
-
-      const data = liveData()
-      if (data !== undefined) return data
-
-      // Use initial data if nothing else available
-      const opts = getOptions()
-      if (opts.initialData !== undefined && version() === 0) {
-        return opts.initialData
-      }
-
-      return undefined
-    },
-  )
-
-  // Set up subscription
   createEffect(
-    on([getArgs, () => getOptions().enabled], ([args, enabled]) => {
-      if (enabled === false) return
+    on([getArgs, getOptions, reloadKey], ([resolvedArgs, opts]) => {
+      if (opts.enabled === false) {
+        batch(() => {
+          if (opts.initialData !== undefined && data() === undefined) {
+            setData(() => opts.initialData)
+          }
+          setError(undefined)
+          setIsLoading(false)
+          setIsStale(false)
+        })
+        return
+      }
+
+      const hasData = data() !== undefined
+
+      batch(() => {
+        setError(undefined)
+
+        if (opts.keepPreviousData && hasData) {
+          setIsLoading(false)
+          setIsStale(true)
+          return
+        }
+
+        if (!hasData && opts.initialData !== undefined) {
+          setData(() => opts.initialData)
+          setIsLoading(false)
+          setIsStale(false)
+          return
+        }
+
+        if (!opts.keepPreviousData) {
+          setData(undefined)
+        }
+        setIsLoading(true)
+        setIsStale(false)
+      })
+
+      try {
+        const local = client.client.localQueryResult(getFunctionName(query), resolvedArgs)
+        if (local !== undefined) {
+          batch(() => {
+            setData(() => local as Data)
+            setError(undefined)
+            setIsLoading(false)
+            setIsStale(false)
+          })
+        }
+      } catch {
+        // localQueryResult can throw before initial subscription
+      }
 
       const unsubscribe = client.onUpdate(
         query,
-        args,
-        data => {
+        resolvedArgs,
+        nextData => {
           batch(() => {
-            setLiveData(() => data as Data)
-            setLiveError(undefined)
-            setVersion(v => v + 1)
+            setData(() => nextData)
+            setError(undefined)
+            setIsLoading(false)
+            setIsStale(false)
           })
         },
-        error => {
+        nextError => {
           batch(() => {
-            setLiveError(() => error)
-            setLiveData(undefined)
-            setVersion(v => v + 1)
+            setError(() => nextError)
+            if (!opts.keepPreviousData) {
+              setData(undefined)
+            }
+            setIsLoading(false)
+            setIsStale(false)
           })
         },
       )
 
       onCleanup(unsubscribe)
     }),
-  )
-
-  // Computed values
-  const data = createMemo(() => {
-    const opts = getOptions()
-    if (opts.keepPreviousData && resource.loading && resource.latest) {
-      return resource.latest
-    }
-    return resource()
-  })
-
-  const error = createMemo(() => resource.error)
-  const isLoading = createMemo(() => resource.loading && !data())
-  const isStale = createMemo(() =>
-    Boolean(
-      getOptions().keepPreviousData &&
-        resource.loading &&
-        resource.latest &&
-        data() === resource.latest,
-    ),
   )
 
   return { data, error, isLoading, isStale, refetch }
@@ -198,6 +223,19 @@ export function useMutation<Mutation extends FunctionReference<'mutation'>>(
 
   const client = useConvexClient()
   if (!client) {
+    if (isServer) {
+      const unsupported = async () => {
+        throw new Error('useMutation cannot execute during SSR without ConvexProvider')
+      }
+      return {
+        mutate: unsupported,
+        mutateAsync: unsupported,
+        data: () => undefined,
+        error: () => undefined,
+        isLoading: () => false,
+        reset: () => {},
+      }
+    }
     throw new Error('useMutation must be used within ConvexProvider')
   }
 
@@ -240,6 +278,19 @@ export function useAction<Action extends FunctionReference<'action'>>(
 
   const client = useConvexClient()
   if (!client) {
+    if (isServer) {
+      const unsupported = async () => {
+        throw new Error('useAction cannot execute during SSR without ConvexProvider')
+      }
+      return {
+        mutate: unsupported,
+        mutateAsync: unsupported,
+        data: () => undefined,
+        error: () => undefined,
+        isLoading: () => false,
+        reset: () => {},
+      }
+    }
     throw new Error('useAction must be used within ConvexProvider')
   }
 
