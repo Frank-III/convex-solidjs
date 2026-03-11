@@ -214,5 +214,5 @@ If you were using the pre-Solid-2 API, the mapping is:
 
 ## Examples
 
-- Demo app: [dev/App.tsx](/Users/new/projects/panta/convex-solidjs/dev/App.tsx)
-- Vite + Rolldown example: [examples/vite-rolldown/src/App.tsx](/Users/new/projects/panta/convex-solidjs/examples/vite-rolldown/src/App.tsx)
+- Demo app: [dev/App.tsx](./dev/App.tsx)
+- Vite + Rolldown example: [examples/vite-rolldown/src/App.tsx](./examples/vite-rolldown/src/App.tsx)

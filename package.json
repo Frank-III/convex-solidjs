@@ -37,7 +37,6 @@
     "prepublishOnly": "pnpm build",
     "format": "prettier --ignore-path .gitignore -w \"src/**/*.{js,ts,json,css,tsx,jsx}\" \"dev/**/*.{js,ts,json,css,tsx,jsx}\"",
     "lint": "concurrently pnpm:lint:*",
-    "lint:code": "eslint --max-warnings 0 --ext .ts,.tsx src",
     "lint:types": "tsc --noEmit",
     "update-deps": "pnpm up -Li"
   },
@@ -47,11 +46,10 @@
   "devDependencies": {
     "@solidjs/web": "2.0.0-beta.1",
     "@types/node": "^24.12.0",
-    "@typescript-eslint/eslint-plugin": "^8.56.1",
-    "@typescript-eslint/parser": "^8.56.1",
     "concurrently": "^9.2.1",
     "esbuild": "^0.25.12",
     "jsdom": "^26.1.0",
+    "oxfmt": "^0.36.0",
     "prettier": "3.8.1",
     "solid-js": "2.0.0-beta.1",
     "tsdown": "^0.21.0",
@@ -68,7 +66,6 @@
     "pnpm": ">=10.0.0"
   },
   "dependencies": {
-    "convex": "^1.32.0",
-    "oxfmt": "^0.36.0"
+    "convex": "^1.32.0"
   }
 }
