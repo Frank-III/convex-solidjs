@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from 'vite-plus'
 import solidPlugin from 'vite-plugin-solid'
 
 export default defineConfig(({ mode }) => {
@@ -20,9 +20,6 @@ export default defineConfig(({ mode }) => {
       isolate: !testSSR,
       env: {
         NODE_ENV: testSSR ? 'production' : 'development',
-        DEV: testSSR ? '' : '1',
-        SSR: testSSR ? '1' : '',
-        PROD: testSSR ? '1' : '',
       },
       environment: testSSR ? 'node' : 'jsdom',
       transformMode: { web: [/\.[jt]sx$/] },

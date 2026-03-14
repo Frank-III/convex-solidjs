@@ -1,59 +1,95 @@
 import {
+  createContext,
+  createMemo,
   onCleanup,
-  createEffect,
-  createSignal,
-  batch,
-  on,
+  useContext,
   type Accessor,
+  type ParentProps,
 } from 'solid-js'
-import { isServer } from 'solid-js/web'
-import { createContextProvider } from '@solid-primitives/context'
-import { ConvexClient, ConvexHttpClient, type ConvexClientOptions } from 'convex/browser'
+import { isServer } from '@solidjs/web'
 import {
-  type FunctionReference,
-  type FunctionArgs,
-  type FunctionReturnType,
-  getFunctionName,
+  ConvexClient,
+  ConvexHttpClient,
+  type ConvexClientOptions,
+} from 'convex/browser'
+import type {
+  FunctionArgs,
+  FunctionReference,
+  FunctionReturnType,
 } from 'convex/server'
 
-// Type helpers for reactive values
-type MaybeAccessor<T> = T | Accessor<T>
+export type MaybeAccessor<T> = T | Accessor<T>
+export type QuerySsrSource = 'server' | 'hybrid' | 'initial' | 'client'
 
-function resolve<T>(value: MaybeAccessor<T>): T {
+export interface CreateQueryOptions<T> {
+  initialValue?: T
+  ssrSource?: QuerySsrSource
+}
+
+const ConvexClientContext = createContext<ConvexClient | null>(null)
+
+function resolveValue<T>(value: MaybeAccessor<T>): T {
   return typeof value === 'function' ? (value as Accessor<T>)() : value
 }
 
-// Create context with proper typing
-export const [ConvexProvider, useConvexClient] = createContextProvider(
-  (props: { client: ConvexClient }) => {
-    return props.client
-  },
-)
-
-// Setup function
-export function setupConvex(url: string, options?: ConvexClientOptions): ConvexClient {
-  if (!url || typeof url !== 'string') {
-    throw new Error('setupConvex requires a valid URL string')
-  }
-
-  return new ConvexClient(url, {
-    disabled: isServer,
-    ...options,
-  })
+function hasOwnInitialValue<T>(
+  options: CreateQueryOptions<T> | undefined,
+): options is CreateQueryOptions<T> & { initialValue: T } {
+  return options != null && Object.prototype.hasOwnProperty.call(options, 'initialValue')
 }
 
-// Setup HTTP client for SSR/data prefetching
-export function setupConvexHttp(
-  url: string,
+function toError(error: unknown): Error {
+  return error instanceof Error ? error : new Error(String(error))
+}
+
+function missingProviderError(label: string): Error {
+  return new Error(`${label} must be used within ConvexProvider`)
+}
+
+function missingProviderExecutionError(label: string): Error {
+  return new Error(`${label} cannot execute during SSR without ConvexProvider`)
+}
+
+function syncThenable<T>(value: T): PromiseLike<T> {
+  return {
+    then(onfulfilled?: ((current: T) => unknown) | null) {
+      return syncThenable(onfulfilled ? onfulfilled(value) : value)
+    },
+  } as PromiseLike<T>
+}
+
+export function ConvexProvider(props: ParentProps<{ client: ConvexClient }>) {
+  return (
+    <ConvexClientContext value={props.client}>
+      {props.children}
+    </ConvexClientContext>
+  )
+}
+
+export function useConvexClient(): ConvexClient {
+  const client = useContext(ConvexClientContext)
+  if (!client) throw missingProviderError('useConvexClient')
+  return client
+}
+
+export function createConvexClient(
+  address: string,
+  options?: ConvexClientOptions,
+): ConvexClient {
+  return new ConvexClient(address, options)
+}
+
+export const setupConvex = createConvexClient
+
+export function createConvexHttpClient(
+  address: string,
   options?: ConstructorParameters<typeof ConvexHttpClient>[1],
 ): ConvexHttpClient {
-  if (!url || typeof url !== 'string') {
-    throw new Error('setupConvexHttp requires a valid URL string')
-  }
-  return new ConvexHttpClient(url, options)
+  return new ConvexHttpClient(address, options)
 }
 
-// Prefetch helper for SSR loaders
+export const setupConvexHttp = createConvexHttpClient
+
 export async function prefetchQuery<Query extends FunctionReference<'query'>>(
   client: ConvexHttpClient,
   query: Query,
@@ -62,264 +98,167 @@ export async function prefetchQuery<Query extends FunctionReference<'query'>>(
   return client.query(query, args)
 }
 
-// Query options
-interface QueryOptions<T> {
-  enabled?: boolean
-  initialData?: T
-  keepPreviousData?: boolean
-}
-
-// Query return type
-interface QueryReturn<T> {
-  data: Accessor<T | undefined>
-  error: Accessor<Error | undefined>
-  isLoading: Accessor<boolean>
-  isStale: Accessor<boolean>
-  refetch: () => void
-}
-
-// Main query hook
-export function useQuery<Query extends FunctionReference<'query'>>(
+export function createQuery<Query extends FunctionReference<'query'>>(
   query: Query,
   args: MaybeAccessor<FunctionArgs<Query>>,
-  options?: MaybeAccessor<QueryOptions<FunctionReturnType<Query>>>,
-): QueryReturn<FunctionReturnType<Query>> {
-  type Data = FunctionReturnType<Query>
-  const defaultOptions = {} as QueryOptions<Data>
+  options?: CreateQueryOptions<FunctionReturnType<Query>>,
+): Accessor<FunctionReturnType<Query>> {
+  const client = useContext(ConvexClientContext)
 
-  // Resolve reactive values
-  const getArgs = () => resolve(args)
-  const getOptions = () => resolve(options) ?? defaultOptions
-
-  // SSR mode: always return initialData and avoid live subscriptions.
-  if (isServer) {
-    const data = () => getOptions().initialData
-    const error = () => undefined
-    const isLoading = () => false
-    const isStale = () => false
-    const refetch = () => {}
-    return { data, error, isLoading, isStale, refetch }
+  if (!client && !isServer) {
+    throw missingProviderError('createQuery')
   }
 
-  const client = useConvexClient()
-  if (!client) {
-    throw new Error('useQuery must be used within ConvexProvider')
-  }
+  const hasInitialValue = hasOwnInitialValue(options)
+  const initialValue = hasInitialValue ? options.initialValue : undefined
+  const ssrSource = options?.ssrSource ?? (hasInitialValue ? 'initial' : undefined)
+  let activeDispose: (() => void) | undefined
 
-  const [reloadKey, setReloadKey] = createSignal(0)
-  const [data, setData] = createSignal<Data | undefined>(getOptions().initialData)
-  const [error, setError] = createSignal<Error | undefined>()
-  const [isLoading, setIsLoading] = createSignal(false)
-  const [isStale, setIsStale] = createSignal(false)
+  const value = createMemo<FunctionReturnType<Query>>(
+    () => {
+      if (!client) throw missingProviderError('createQuery')
 
-  const refetch = () => setReloadKey(v => v + 1)
+      activeDispose?.()
 
-  createEffect(
-    on([getArgs, getOptions, reloadKey], ([resolvedArgs, opts]) => {
-      if (opts.enabled === false) {
-        batch(() => {
-          if (opts.initialData !== undefined && data() === undefined) {
-            setData(() => opts.initialData)
-          }
-          setError(undefined)
-          setIsLoading(false)
-          setIsStale(false)
-        })
-        return
-      }
-
-      const hasData = data() !== undefined
-
-      batch(() => {
-        setError(undefined)
-
-        if (opts.keepPreviousData && hasData) {
-          setIsLoading(false)
-          setIsStale(true)
-          return
-        }
-
-        if (!hasData && opts.initialData !== undefined) {
-          setData(() => opts.initialData)
-          setIsLoading(false)
-          setIsStale(false)
-          return
-        }
-
-        if (!opts.keepPreviousData) {
-          setData(undefined)
-        }
-        setIsLoading(true)
-        setIsStale(false)
-      })
-
-      try {
-        const local = client.client.localQueryResult(getFunctionName(query), resolvedArgs)
-        if (local !== undefined) {
-          batch(() => {
-            setData(() => local as Data)
-            setError(undefined)
-            setIsLoading(false)
-            setIsStale(false)
-          })
-        }
-      } catch {
-        // localQueryResult can throw before initial subscription
-      }
+      const queryArgs = resolveValue(args)
+      const queue: FunctionReturnType<Query>[] = []
+      let nextResolve: ((result: IteratorResult<FunctionReturnType<Query>>) => void) | null = null
+      let nextReject: ((reason?: unknown) => void) | null = null
+      let pendingError: Error | null = null
+      let closed = false
 
       const unsubscribe = client.onUpdate(
         query,
-        resolvedArgs,
-        nextData => {
-          batch(() => {
-            setData(() => nextData)
-            setError(undefined)
-            setIsLoading(false)
-            setIsStale(false)
-          })
+        queryArgs,
+        result => {
+          if (closed) return
+
+          if (nextResolve) {
+            const resolve = nextResolve
+            nextResolve = null
+            nextReject = null
+            resolve({ value: result, done: false })
+            return
+          }
+
+          queue.push(result)
         },
-        nextError => {
-          batch(() => {
-            setError(() => nextError)
-            if (!opts.keepPreviousData) {
-              setData(undefined)
-            }
-            setIsLoading(false)
-            setIsStale(false)
-          })
+        reason => {
+          const error = toError(reason)
+          if (closed) return
+
+          if (nextReject) {
+            const reject = nextReject
+            nextResolve = null
+            nextReject = null
+            reject(error)
+            return
+          }
+
+          pendingError = error
         },
       )
 
-      onCleanup(unsubscribe)
-    }),
+      const disposeQuery = () => {
+        if (closed) return
+        closed = true
+        unsubscribe.unsubscribe()
+        if (nextResolve) {
+          nextResolve({
+            value: undefined as FunctionReturnType<Query>,
+            done: true,
+          })
+          nextResolve = null
+          nextReject = null
+        }
+        if (activeDispose === disposeQuery) {
+          activeDispose = undefined
+        }
+      }
+      activeDispose = disposeQuery
+
+      const currentValue = unsubscribe.getCurrentValue()
+      if (currentValue !== undefined) {
+        queue.push(currentValue)
+      }
+
+      onCleanup(disposeQuery)
+
+      return ({
+        [Symbol.asyncIterator]() {
+          return {
+            next() {
+              if (pendingError) {
+                const error = pendingError
+                pendingError = null
+                return Promise.reject(error)
+              }
+
+              if (queue.length > 0) {
+                return syncThenable({ value: queue.shift()!, done: false })
+              }
+
+              if (closed) {
+                return syncThenable({
+                  value: undefined as FunctionReturnType<Query>,
+                  done: true,
+                })
+              }
+
+              return new Promise((resolve, reject) => {
+                nextResolve = resolve
+                nextReject = reject
+              })
+            },
+            return() {
+              disposeQuery()
+              return syncThenable({
+                value: undefined as FunctionReturnType<Query>,
+                done: true,
+              })
+            },
+          }
+        },
+      }) as AsyncIterable<FunctionReturnType<Query>>
+    },
+    initialValue as FunctionReturnType<Query>,
+    {
+      name: 'convex-query',
+      ssrSource,
+    },
   )
 
-  return { data, error, isLoading, isStale, refetch }
+  onCleanup(() => activeDispose?.())
+
+  return value
 }
 
-// Mutation state
-interface MutationState<T> {
-  data?: T
-  error?: Error
-  isLoading: boolean
-}
-
-// Mutation return type
-interface MutationReturn<TArgs, TResult> {
-  mutate: (args: TArgs) => Promise<TResult>
-  mutateAsync: (args: TArgs) => Promise<TResult>
-  data: Accessor<TResult | undefined>
-  error: Accessor<Error | undefined>
-  isLoading: Accessor<boolean>
-  reset: () => void
-}
-
-// Mutation hook
-export function useMutation<Mutation extends FunctionReference<'mutation'>>(
+export function createMutation<Mutation extends FunctionReference<'mutation'>>(
   mutation: Mutation,
-): MutationReturn<FunctionArgs<Mutation>, FunctionReturnType<Mutation>> {
-  type Args = FunctionArgs<Mutation>
-  type Result = FunctionReturnType<Mutation>
+): (args: FunctionArgs<Mutation>) => Promise<FunctionReturnType<Mutation>> {
+  const client = useContext(ConvexClientContext)
 
-  const client = useConvexClient()
   if (!client) {
-    if (isServer) {
-      const unsupported = async () => {
-        throw new Error('useMutation cannot execute during SSR without ConvexProvider')
-      }
-      return {
-        mutate: unsupported,
-        mutateAsync: unsupported,
-        data: () => undefined,
-        error: () => undefined,
-        isLoading: () => false,
-        reset: () => {},
-      }
-    }
-    throw new Error('useMutation must be used within ConvexProvider')
-  }
-
-  const [state, setState] = createSignal<MutationState<Result>>({
-    isLoading: false,
-  })
-
-  const mutateAsync = async (args: Args): Promise<Result> => {
-    setState({ isLoading: true })
-
-    try {
-      const result = await client.mutation(mutation, args)
-      setState({ data: result, isLoading: false })
-      return result
-    } catch (error) {
-      const err = error instanceof Error ? error : new Error(String(error))
-      setState({ error: err, isLoading: false })
-      throw err
+    if (!isServer) throw missingProviderError('createMutation')
+    return async () => {
+      throw missingProviderExecutionError('createMutation')
     }
   }
 
-  const reset = () => setState({ isLoading: false })
-
-  return {
-    mutate: mutateAsync,
-    mutateAsync,
-    data: () => state().data,
-    error: () => state().error,
-    isLoading: () => state().isLoading,
-    reset,
-  }
+  return args => client.mutation(mutation, args)
 }
 
-// Action hook
-export function useAction<Action extends FunctionReference<'action'>>(
-  action: Action,
-): MutationReturn<FunctionArgs<Action>, FunctionReturnType<Action>> {
-  type Args = FunctionArgs<Action>
-  type Result = FunctionReturnType<Action>
+export function createConvexAction<ActionRef extends FunctionReference<'action'>>(
+  actionReference: ActionRef,
+): (args: FunctionArgs<ActionRef>) => Promise<FunctionReturnType<ActionRef>> {
+  const client = useContext(ConvexClientContext)
 
-  const client = useConvexClient()
   if (!client) {
-    if (isServer) {
-      const unsupported = async () => {
-        throw new Error('useAction cannot execute during SSR without ConvexProvider')
-      }
-      return {
-        mutate: unsupported,
-        mutateAsync: unsupported,
-        data: () => undefined,
-        error: () => undefined,
-        isLoading: () => false,
-        reset: () => {},
-      }
-    }
-    throw new Error('useAction must be used within ConvexProvider')
-  }
-
-  const [state, setState] = createSignal<MutationState<Result>>({
-    isLoading: false,
-  })
-
-  const executeAsync = async (args: Args): Promise<Result> => {
-    setState({ isLoading: true })
-
-    try {
-      const result = await client.action(action, args)
-      setState({ data: result, isLoading: false })
-      return result
-    } catch (error) {
-      const err = error instanceof Error ? error : new Error(String(error))
-      setState({ error: err, isLoading: false })
-      throw err
+    if (!isServer) throw missingProviderError('createConvexAction')
+    return async () => {
+      throw missingProviderExecutionError('createConvexAction')
     }
   }
 
-  const reset = () => setState({ isLoading: false })
-
-  return {
-    mutate: executeAsync,
-    mutateAsync: executeAsync,
-    data: () => state().data,
-    error: () => state().error,
-    isLoading: () => state().isLoading,
-    reset,
-  }
+  return args => client.action(actionReference, args)
 }
