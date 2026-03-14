@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from 'vite-plus'
 import solidPlugin from 'vite-plugin-solid'
 
 export default defineConfig(({ mode }) => {

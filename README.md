@@ -15,7 +15,7 @@ This package is a breaking rewrite for Solid 2 beta. There is no React-style que
 ## Installation
 
 ```bash
-pnpm add convex convex-solidjs solid-js
+pnpm add convex convex-solidjs solid-js @solidjs/web
 ```
 
 ## Core Model
@@ -30,7 +30,7 @@ pnpm add convex convex-solidjs solid-js
 ## Quick Start
 
 ```tsx
-import { render } from 'solid-js/web'
+import { render } from '@solidjs/web'
 import { ConvexProvider, setupConvex } from 'convex-solidjs'
 import App from './App'
 

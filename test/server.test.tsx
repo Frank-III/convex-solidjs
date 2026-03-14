@@ -1,6 +1,6 @@
 import { Loading } from 'solid-js'
 import { renderToString } from '@solidjs/web'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vite-plus/test'
 import {
   createConvexAction,
   createMutation,

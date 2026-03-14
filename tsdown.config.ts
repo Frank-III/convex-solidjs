@@ -1,4 +1,4 @@
-import { defineConfig } from 'tsdown'
+import { defineConfig } from 'vite-plus/pack'
 import solidPlugin from 'vite-plugin-solid'
 
 export default defineConfig({

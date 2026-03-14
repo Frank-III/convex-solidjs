@@ -1,6 +1,6 @@
 import { Errored, For, Loading, createSignal, flush, isPending } from 'solid-js'
 import { render } from '@solidjs/web'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vite-plus/test'
 import {
   ConvexProvider,
   createConvexAction,

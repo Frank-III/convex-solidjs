@@ -13,14 +13,14 @@ importers:
         version: 1.32.0
       convex-solidjs:
         specifier: file:../..
-        version: file:../..(solid-js@2.0.0-beta.1)
+        version: file:../..(solid-js@2.0.0-beta.2)
       solid-js:
-        specifier: 2.0.0-beta.1
-        version: 2.0.0-beta.1
+        specifier: 2.0.0-beta.2
+        version: 2.0.0-beta.2
     devDependencies:
       '@solidjs/web':
-        specifier: 2.0.0-beta.1
-        version: 2.0.0-beta.1(solid-js@2.0.0-beta.1)
+        specifier: 2.0.0-beta.2
+        version: 2.0.0-beta.2(@solidjs/signals@0.12.0)(solid-js@2.0.0-beta.2)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -29,7 +29,7 @@ importers:
         version: rolldown-vite@7.3.1(esbuild@0.27.0)
       vite-plugin-solid:
         specifier: 3.0.0-next.2
-        version: 3.0.0-next.2(rolldown-vite@7.3.1(esbuild@0.27.0))(solid-js@2.0.0-beta.1)
+        version: 3.0.0-next.2(rolldown-vite@7.3.1(esbuild@0.27.0))(solid-js@2.0.0-beta.2)
 
 packages:
 
@@ -305,128 +305,6 @@ packages:
   '@oxc-project/types@0.101.0':
     resolution: {integrity: sha512-nuFhqlUzJX+gVIPPfuE6xurd4lST3mdcWOhyK/rZO0B9XWMKm79SuszIQEnSMmmDhq1DC8WWVYGVd+6F93o1gQ==}
 
-  '@oxfmt/binding-android-arm-eabi@0.36.0':
-    resolution: {integrity: sha512-Z4yVHJWx/swHHjtr0dXrBZb6LxS+qNz1qdza222mWwPTUK4L790+5i3LTgjx3KYGBzcYpjaiZBw4vOx94dH7MQ==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [arm]
-    os: [android]
-
-  '@oxfmt/binding-android-arm64@0.36.0':
-    resolution: {integrity: sha512-3ElCJRFNPQl7jexf2CAa9XmAm8eC5JPrIDSjc9jSchkVSFTEqyL0NtZinBB2h1a4i4JgP1oGl/5G5n8YR4FN8Q==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [arm64]
-    os: [android]
-
-  '@oxfmt/binding-darwin-arm64@0.36.0':
-    resolution: {integrity: sha512-nak4znWCqIExKhYSY/mz/lWsqWIpdsS7o0+SRzXR1Q0m7GrMcG1UrF1pS7TLGZhhkf7nTfEF7q6oZzJiodRDuw==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@oxfmt/binding-darwin-x64@0.36.0':
-    resolution: {integrity: sha512-V4GP96thDnpKx6ADnMDnhIXNdtV+Ql9D4HUU+a37VTeVbs5qQSF/s6hhUP1b3xUqU7iRcwh72jUU2Y12rtGHAw==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [x64]
-    os: [darwin]
-
-  '@oxfmt/binding-freebsd-x64@0.36.0':
-    resolution: {integrity: sha512-/xapWCADfI5wrhxpEUjhI9fnw7MV5BUZizVa8e24n3VSK6A3Y1TB/ClOP1tfxNspykFKXp4NBWl6NtDJP3osqQ==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [x64]
-    os: [freebsd]
-
-  '@oxfmt/binding-linux-arm-gnueabihf@0.36.0':
-    resolution: {integrity: sha512-1lOmv61XMFIH5uNm27620kRRzWt/RK6tdn250BRDoG9W7OXGOQ5UyI1HVT+SFkoOoKztBiinWgi68+NA1MjBVQ==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [arm]
-    os: [linux]
-
-  '@oxfmt/binding-linux-arm-musleabihf@0.36.0':
-    resolution: {integrity: sha512-vMH23AskdR1ujUS9sPck2Df9rBVoZUnCVY86jisILzIQ/QQ/yKUTi7tgnIvydPx7TyB/48wsQ5QMr5Knq5p/aw==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [arm]
-    os: [linux]
-
-  '@oxfmt/binding-linux-arm64-gnu@0.36.0':
-    resolution: {integrity: sha512-Hy1V+zOBHpBiENRx77qrUTt5aPDHeCASRc8K5KwwAHkX2AKP0nV89eL17hsZrE9GmnXFjsNmd80lyf7aRTXsbw==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  '@oxfmt/binding-linux-arm64-musl@0.36.0':
-    resolution: {integrity: sha512-SPGLJkOIHSIC6ABUQ5V8NqJpvYhMJueJv26NYqfCnwi/Mn6A61amkpJJ9Suy0Nmvs+OWESJpcebrBUbXPGZyQQ==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [arm64]
-    os: [linux]
-    libc: [musl]
-
-  '@oxfmt/binding-linux-ppc64-gnu@0.36.0':
-    resolution: {integrity: sha512-3EuoyB8x9x8ysYJjbEO/M9fkSk72zQKnXCvpZMDHXlnY36/1qMp55Nm0PrCwjGO/1pen5hdOVkz9WmP3nAp2IQ==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [ppc64]
-    os: [linux]
-    libc: [glibc]
-
-  '@oxfmt/binding-linux-riscv64-gnu@0.36.0':
-    resolution: {integrity: sha512-MpY3itLwpGh8dnywtrZtaZ604T1m715SydCKy0+qTxetv+IHzuA+aO/AGzrlzUNYZZmtWtmDBrChZGibvZxbRQ==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [riscv64]
-    os: [linux]
-    libc: [glibc]
-
-  '@oxfmt/binding-linux-riscv64-musl@0.36.0':
-    resolution: {integrity: sha512-mmDhe4Vtx+XwQPRPn/V25+APnkApYgZ23q+6GVsNYY98pf3aU0aI3Me96pbRs/AfJ1jIiGC+/6q71FEu8dHcHw==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [riscv64]
-    os: [linux]
-    libc: [musl]
-
-  '@oxfmt/binding-linux-s390x-gnu@0.36.0':
-    resolution: {integrity: sha512-AYXhU+DmNWLSnvVwkHM92fuYhogtVHab7UQrPNaDf1sxadugg9gWVmcgJDlIwxJdpk5CVW/TFvwUKwI432zhhA==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [s390x]
-    os: [linux]
-    libc: [glibc]
-
-  '@oxfmt/binding-linux-x64-gnu@0.36.0':
-    resolution: {integrity: sha512-H16QhhQ3usoakMleiAAQ2mg0NsBDAdyE9agUgfC8IHHh3jZEbr0rIKwjEqwbOHK5M0EmfhJmr+aGO/MgZPsneA==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-
-  '@oxfmt/binding-linux-x64-musl@0.36.0':
-    resolution: {integrity: sha512-EFFGkixA39BcmHiCe2ECdrq02D6FCve5ka6ObbvrheXl4V+R0U/E+/uLyVx1X65LW8TA8QQHdnbdDallRekohw==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [x64]
-    os: [linux]
-    libc: [musl]
-
-  '@oxfmt/binding-openharmony-arm64@0.36.0':
-    resolution: {integrity: sha512-zr/t369wZWFOj1qf06Z5gGNjFymfUNDrxKMmr7FKiDRVI1sNsdKRCuRL4XVjtcptKQ+ao3FfxLN1vrynivmCYg==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [arm64]
-    os: [openharmony]
-
-  '@oxfmt/binding-win32-arm64-msvc@0.36.0':
-    resolution: {integrity: sha512-FxO7UksTv8h4olzACgrqAXNF6BP329+H322323iDrMB5V/+a1kcAw07fsOsUmqNrb9iJBsCQgH/zqcqp5903ag==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [arm64]
-    os: [win32]
-
-  '@oxfmt/binding-win32-ia32-msvc@0.36.0':
-    resolution: {integrity: sha512-OjoMQ89H01M0oLMfr/CPNH1zi48ZIwxAKObUl57oh7ssUBNDp/2Vjf7E1TQ8M4oj4VFQ/byxl2SmcPNaI2YNDg==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [ia32]
-    os: [win32]
-
-  '@oxfmt/binding-win32-x64-msvc@0.36.0':
-    resolution: {integrity: sha512-MoyeQ9S36ZTz/4bDhOKJgOBIDROd4dQ5AkT9iezhEaUBxAPdNX9Oq0jD8OSnCj3G4wam/XNxVWKMA52kmzmPtQ==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [x64]
-    os: [win32]
-
   '@rolldown/binding-android-arm64@1.0.0-beta.53':
     resolution: {integrity: sha512-Ok9V8o7o6YfSdTTYA/uHH30r3YtOxLD6G3wih/U9DO0ucBBFq8WPt/DslU53OgfteLRHITZny9N/qCUxMf9kjQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -511,13 +389,14 @@ packages:
   '@rolldown/pluginutils@1.0.0-beta.53':
     resolution: {integrity: sha512-vENRlFU4YbrwVqNDZ7fLvy+JR1CRkyr01jhSiDpE1u6py3OMzQfztQU2jxykW3ALNxO4kSlqIDeYyD0Y9RcQeQ==}
 
-  '@solidjs/signals@0.11.3':
-    resolution: {integrity: sha512-udMfutYPOlcxKUmc5+n1QtarsxOiAlC6LJY2TqFyaMwdXgo+reiYUcYGDlOiAPXfCLE0lavZHQ/6GT5pJbXKBA==}
+  '@solidjs/signals@0.12.0':
+    resolution: {integrity: sha512-4yeBvMCTCCPZZ1G/x0XUVg82tgC/gLikPhl91cSdGvZXMLQUEHO9Ugbca0MfICcHHJXySieFyZrMNlQ5rWcGyQ==}
 
-  '@solidjs/web@2.0.0-beta.1':
-    resolution: {integrity: sha512-1yqGoxYg9WfZ5gZLqAW9vE6bobLJs7asfhELUZOzNltV3whNz2mOkP251aUe2BAec3talFI3AVfi5CCExumIJA==}
+  '@solidjs/web@2.0.0-beta.2':
+    resolution: {integrity: sha512-2nYMBWaNjitUdfrTZRKGk9GUJq/egE6u+ziPVdUuoIzYuu5qIMDxdYlo1C1VIajR0Kw2qMtzipt7kMZEd1rJKg==}
     peerDependencies:
-      solid-js: ^2.0.0-beta.1
+      '@solidjs/signals': ^0.12.0
+      solid-js: ^2.0.0-beta.2
 
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
@@ -568,7 +447,7 @@ packages:
     resolution: {directory: ../.., type: directory}
     engines: {node: '>=24', pnpm: '>=10.0.0'}
     peerDependencies:
-      solid-js: ^2.0.0-beta.1
+      solid-js: ^2.0.0-beta.2
 
   convex@1.32.0:
     resolution: {integrity: sha512-5FlajdLpW75pdLS+/CgGH5H6yeRuA+ru50AKJEYbJpmyILUS+7fdTvsdTaQ7ZFXMv0gE8mX4S+S3AtJ94k0mfw==}
@@ -748,11 +627,6 @@ packages:
   node-releases@2.0.36:
     resolution: {integrity: sha512-TdC8FSgHz8Mwtw9g5L4gR/Sh9XhSP/0DEkQxfEFXOpiul5IiHgHan2VhYYb6agDSfp4KuvltmGApc8HMgUrIkA==}
 
-  oxfmt@0.36.0:
-    resolution: {integrity: sha512-/ejJ+KoSW6J9bcNT9a9UtJSJNWhJ3yOLSBLbkoFHJs/8CZjmaZVZAJe4YgO1KMJlKpNQasrn/G9JQUEZI3p0EQ==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    hasBin: true
-
   parse5@7.3.0:
     resolution: {integrity: sha512-IInvU7fabl34qmi9gY8XOVxhYyMyuH2xUNpb2q8/Y+7552KlejkRvqvD19nMoUW/uQGGbqNpA6Tufu5FL5BZgw==}
 
@@ -831,8 +705,8 @@ packages:
     resolution: {integrity: sha512-OE4cvmJ1uSPrKorFIH9/w/Qwuvi/IMcGbv5RKgcJ/zjA/IohDLU6SVaxFN9FwajbP7nsX0dQqMDes1whk3y+yw==}
     engines: {node: '>=10'}
 
-  solid-js@2.0.0-beta.1:
-    resolution: {integrity: sha512-eQyVTBI0ytx6xR/ja7O3yXMeYKZXa9W1rigzXwGd3X3B06sVyVYFaF1Vcx8f5P9o5zp0QCN0g3y1zbY0TLcXeQ==}
+  solid-js@2.0.0-beta.2:
+    resolution: {integrity: sha512-vbU2KAKXUcyjFi85CVJBmrct680fDfALl1sb7W4dQSm4Ls6XOVIDWJMUvrFeBo13X+ov/18ZpwPWv4nSzgVcww==}
 
   solid-refresh@0.8.0-next.2:
     resolution: {integrity: sha512-fhJ3ZT8QOMvyvtF6KJqaI6vG8OK/EIcarNy9S0EsEmlin7qfh4XndSQWFMQyiyIA22rjbj0w5GXiaAwTLQSLXA==}
@@ -846,10 +720,6 @@ packages:
   tinyglobby@0.2.15:
     resolution: {integrity: sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ==}
     engines: {node: '>=12.0.0'}
-
-  tinypool@2.1.0:
-    resolution: {integrity: sha512-Pugqs6M0m7Lv1I7FtxN4aoyToKg1C4tu+/381vH35y8oENM/Ai7f7C4StcoK4/+BSw9ebcS8jRiVrORFKCALLw==}
-    engines: {node: ^20.0.0 || >=22.0.0}
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
@@ -1138,63 +1008,6 @@ snapshots:
 
   '@oxc-project/types@0.101.0': {}
 
-  '@oxfmt/binding-android-arm-eabi@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-android-arm64@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-darwin-arm64@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-darwin-x64@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-freebsd-x64@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-linux-arm-gnueabihf@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-linux-arm-musleabihf@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-linux-arm64-gnu@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-linux-arm64-musl@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-linux-ppc64-gnu@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-linux-riscv64-gnu@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-linux-riscv64-musl@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-linux-s390x-gnu@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-linux-x64-gnu@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-linux-x64-musl@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-openharmony-arm64@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-win32-arm64-msvc@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-win32-ia32-msvc@0.36.0':
-    optional: true
-
-  '@oxfmt/binding-win32-x64-msvc@0.36.0':
-    optional: true
-
   '@rolldown/binding-android-arm64@1.0.0-beta.53':
     optional: true
 
@@ -1238,13 +1051,14 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.0-beta.53': {}
 
-  '@solidjs/signals@0.11.3': {}
+  '@solidjs/signals@0.12.0': {}
 
-  '@solidjs/web@2.0.0-beta.1(solid-js@2.0.0-beta.1)':
+  '@solidjs/web@2.0.0-beta.2(@solidjs/signals@0.12.0)(solid-js@2.0.0-beta.2)':
     dependencies:
+      '@solidjs/signals': 0.12.0
       seroval: 1.5.0
       seroval-plugins: 1.5.0(seroval@1.5.0)
-      solid-js: 2.0.0-beta.1
+      solid-js: 2.0.0-beta.2
 
   '@tybys/wasm-util@0.10.1':
     dependencies:
@@ -1282,12 +1096,12 @@ snapshots:
       parse5: 7.3.0
       validate-html-nesting: 1.2.4
 
-  babel-preset-solid@2.0.0-experimental.16(@babel/core@7.29.0)(solid-js@2.0.0-beta.1):
+  babel-preset-solid@2.0.0-experimental.16(@babel/core@7.29.0)(solid-js@2.0.0-beta.2):
     dependencies:
       '@babel/core': 7.29.0
       babel-plugin-jsx-dom-expressions: 0.41.0-next.11(@babel/core@7.29.0)
     optionalDependencies:
-      solid-js: 2.0.0-beta.1
+      solid-js: 2.0.0-beta.2
 
   baseline-browser-mapping@2.10.0: {}
 
@@ -1303,11 +1117,10 @@ snapshots:
 
   convert-source-map@2.0.0: {}
 
-  convex-solidjs@file:../..(solid-js@2.0.0-beta.1):
+  convex-solidjs@file:../..(solid-js@2.0.0-beta.2):
     dependencies:
       convex: 1.32.0
-      oxfmt: 0.36.0
-      solid-js: 2.0.0-beta.1
+      solid-js: 2.0.0-beta.2
     transitivePeerDependencies:
       - '@auth0/auth0-react'
       - '@clerk/clerk-react'
@@ -1449,30 +1262,6 @@ snapshots:
 
   node-releases@2.0.36: {}
 
-  oxfmt@0.36.0:
-    dependencies:
-      tinypool: 2.1.0
-    optionalDependencies:
-      '@oxfmt/binding-android-arm-eabi': 0.36.0
-      '@oxfmt/binding-android-arm64': 0.36.0
-      '@oxfmt/binding-darwin-arm64': 0.36.0
-      '@oxfmt/binding-darwin-x64': 0.36.0
-      '@oxfmt/binding-freebsd-x64': 0.36.0
-      '@oxfmt/binding-linux-arm-gnueabihf': 0.36.0
-      '@oxfmt/binding-linux-arm-musleabihf': 0.36.0
-      '@oxfmt/binding-linux-arm64-gnu': 0.36.0
-      '@oxfmt/binding-linux-arm64-musl': 0.36.0
-      '@oxfmt/binding-linux-ppc64-gnu': 0.36.0
-      '@oxfmt/binding-linux-riscv64-gnu': 0.36.0
-      '@oxfmt/binding-linux-riscv64-musl': 0.36.0
-      '@oxfmt/binding-linux-s390x-gnu': 0.36.0
-      '@oxfmt/binding-linux-x64-gnu': 0.36.0
-      '@oxfmt/binding-linux-x64-musl': 0.36.0
-      '@oxfmt/binding-openharmony-arm64': 0.36.0
-      '@oxfmt/binding-win32-arm64-msvc': 0.36.0
-      '@oxfmt/binding-win32-ia32-msvc': 0.36.0
-      '@oxfmt/binding-win32-x64-msvc': 0.36.0
-
   parse5@7.3.0:
     dependencies:
       entities: 6.0.1
@@ -1529,18 +1318,18 @@ snapshots:
 
   seroval@1.5.0: {}
 
-  solid-js@2.0.0-beta.1:
+  solid-js@2.0.0-beta.2:
     dependencies:
-      '@solidjs/signals': 0.11.3
+      '@solidjs/signals': 0.12.0
       csstype: 3.2.3
       seroval: 1.5.0
       seroval-plugins: 1.5.0(seroval@1.5.0)
 
-  solid-refresh@0.8.0-next.2(solid-js@2.0.0-beta.1):
+  solid-refresh@0.8.0-next.2(solid-js@2.0.0-beta.2):
     dependencies:
       '@babel/generator': 7.29.1
       '@babel/types': 7.29.0
-      solid-js: 2.0.0-beta.1
+      solid-js: 2.0.0-beta.2
 
   source-map-js@1.2.1: {}
 
@@ -1548,8 +1337,6 @@ snapshots:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.3)
       picomatch: 4.0.3
-
-  tinypool@2.1.0: {}
 
   tslib@2.8.1:
     optional: true
@@ -1564,14 +1351,14 @@ snapshots:
 
   validate-html-nesting@1.2.4: {}
 
-  vite-plugin-solid@3.0.0-next.2(rolldown-vite@7.3.1(esbuild@0.27.0))(solid-js@2.0.0-beta.1):
+  vite-plugin-solid@3.0.0-next.2(rolldown-vite@7.3.1(esbuild@0.27.0))(solid-js@2.0.0-beta.2):
     dependencies:
       '@babel/core': 7.29.0
       '@types/babel__core': 7.20.5
-      babel-preset-solid: 2.0.0-experimental.16(@babel/core@7.29.0)(solid-js@2.0.0-beta.1)
+      babel-preset-solid: 2.0.0-experimental.16(@babel/core@7.29.0)(solid-js@2.0.0-beta.2)
       merge-anything: 5.1.7
-      solid-js: 2.0.0-beta.1
-      solid-refresh: 0.8.0-next.2(solid-js@2.0.0-beta.1)
+      solid-js: 2.0.0-beta.2
+      solid-refresh: 0.8.0-next.2(solid-js@2.0.0-beta.2)
       vite: rolldown-vite@7.3.1(esbuild@0.27.0)
       vitefu: 1.1.2(rolldown-vite@7.3.1(esbuild@0.27.0))
     transitivePeerDependencies:

@@ -11,10 +11,10 @@
   "dependencies": {
     "convex": "^1.32.0",
     "convex-solidjs": "file:../..",
-    "solid-js": "2.0.0-beta.1"
+    "solid-js": "2.0.0-beta.2"
   },
   "devDependencies": {
-    "@solidjs/web": "2.0.0-beta.1",
+    "@solidjs/web": "2.0.0-beta.2",
     "typescript": "^5.9.3",
     "vite": "npm:rolldown-vite@7.3.1",
     "vite-plugin-solid": "3.0.0-next.2"
